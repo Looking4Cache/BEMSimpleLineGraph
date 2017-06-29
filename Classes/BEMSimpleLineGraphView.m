@@ -1379,22 +1379,27 @@ typedef NS_ENUM(NSInteger, BEMInternalTags)
     self.popUpView.center = CGPointMake(self.xCenterLabel, self.yCenterLabel);
     self.popUpLabel.center = self.popUpView.center;
     int index = (int)(closestDot.tag - DotFirstTag100);
-
+    
     if ([self.delegate respondsToSelector:@selector(lineGraph:modifyPopupView:forIndex:)]) {
         [self.delegate lineGraph:self modifyPopupView:self.popUpView forIndex:index];
+    }
+    if ([self.delegate respondsToSelector:@selector(popUpTextForlineGraph:forIndex:)]) {
+        self.popUpLabel.text = [self.delegate popUpTextForlineGraph:self forIndex:index];
     }
     self.xCenterLabel = closestDot.center.x;
     self.yCenterLabel = closestDot.center.y - closestDot.frame.size.height/2 - 15;
     self.popUpView.center = CGPointMake(self.xCenterLabel, self.yCenterLabel);
-
+    
     self.popUpView.alpha = 1.0;
     
     CGPoint popUpViewCenter = CGPointZero;
     
-    if ([self.delegate respondsToSelector:@selector(popUpSuffixForlineGraph:)])
-        self.popUpLabel.text = [NSString stringWithFormat:@"%li%@", (long)[dataPoints[(NSInteger) closestDot.tag - DotFirstTag100] integerValue], [self.delegate popUpSuffixForlineGraph:self]];
-    else
-        self.popUpLabel.text = [NSString stringWithFormat:@"%li", (long)[dataPoints[(NSInteger) closestDot.tag - DotFirstTag100] integerValue]];
+    if (![self.delegate respondsToSelector:@selector(popUpTextForlineGraph:forIndex:)]) {
+        if ([self.delegate respondsToSelector:@selector(popUpSuffixForlineGraph:)])
+            self.popUpLabel.text = [NSString stringWithFormat:@"%li%@", (long)[dataPoints[(NSInteger) closestDot.tag - DotFirstTag100] integerValue], [self.delegate popUpSuffixForlineGraph:self]];
+        else
+            self.popUpLabel.text = [NSString stringWithFormat:@"%li", (long)[dataPoints[(NSInteger) closestDot.tag - DotFirstTag100] integerValue]];
+    }
     
     if (self.enableYAxisLabel == YES && self.popUpView.frame.origin.x <= self.YAxisLabelXOffset && !self.positionYAxisRight) {
         self.xCenterLabel = self.popUpView.frame.size.width/2;
@@ -1414,7 +1419,7 @@ typedef NS_ENUM(NSInteger, BEMInternalTags)
         self.yCenterLabel = closestDot.center.y + closestDot.frame.size.height/2 + 15;
         popUpViewCenter = CGPointMake(self.xCenterLabel, closestDot.center.y + closestDot.frame.size.height/2 + 15);
     }
-
+    
     if (!CGPointEqualToPoint(popUpViewCenter, CGPointZero)) {
         self.popUpView.center = popUpViewCenter;
     }
@@ -1424,20 +1429,27 @@ typedef NS_ENUM(NSInteger, BEMInternalTags)
             self.popUpView.alpha = 0.7;
             self.popUpLabel.alpha = 1;
         } completion:nil];
-        NSString *prefix = @"";
-        NSString *suffix = @"";
-        if ([self.delegate respondsToSelector:@selector(popUpSuffixForlineGraph:)]) {
-            suffix = [self.delegate popUpSuffixForlineGraph:self];
+        if (![self.delegate respondsToSelector:@selector(popUpTextForlineGraph:forIndex:)]) {
+            NSString *prefix = @"";
+            NSString *suffix = @"";
+            if ([self.delegate respondsToSelector:@selector(popUpSuffixForlineGraph:)]) {
+                suffix = [self.delegate popUpSuffixForlineGraph:self];
+            }
+            if ([self.delegate respondsToSelector:@selector(popUpPrefixForlineGraph:)]) {
+                prefix = [self.delegate popUpPrefixForlineGraph:self];
+            }
+            NSNumber *value = dataPoints[index];
+            NSString *formattedValue = [NSString stringWithFormat:self.formatStringForValues, value.doubleValue];
+            self.popUpLabel.text = [NSString stringWithFormat:@"%@%@%@", prefix, formattedValue, suffix];
         }
-        if ([self.delegate respondsToSelector:@selector(popUpPrefixForlineGraph:)]) {
-            prefix = [self.delegate popUpPrefixForlineGraph:self];
-        }
-        NSNumber *value = dataPoints[index];
-        NSString *formattedValue = [NSString stringWithFormat:self.formatStringForValues, value.doubleValue];
-        self.popUpLabel.text = [NSString stringWithFormat:@"%@%@%@", prefix, formattedValue, suffix];
+        NSDictionary *attributes = @{NSFontAttributeName: self.popUpLabel.font};
+        float width = [self.popUpLabel.text sizeWithAttributes:attributes].width + 4;
+        self.popUpLabel.frame = CGRectMake(self.popUpLabel.frame.origin.x, self.popUpLabel.frame.origin.y, width, self.popUpLabel.frame.size.height);
+        self.popUpView.frame = CGRectMake(self.popUpView.frame.origin.x, self.popUpView.frame.origin.y, width, self.popUpView.frame.size.height);
         self.popUpLabel.center = self.popUpView.center;
     }
 }
+
 
 #pragma mark - Graph Calculations
 

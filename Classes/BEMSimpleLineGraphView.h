@@ -446,6 +446,12 @@ IB_DESIGNABLE @interface BEMSimpleLineGraphView : UIView <UIGestureRecognizerDel
 //----- CUSTOMIZATION -----//
 
 
+/** The text for the popup report. Auto calculation from the y axis and the suffix/prefix will be ignored.
+ @param graph The graph object requesting the text.
+ @return The suffix to append to the popup report. */
+- (NSString *)popUpTextForlineGraph:(BEMSimpleLineGraphView *)graph forIndex:(CGFloat)index;
+
+
 /** The optional suffix to append to the popup report.
  @param graph The graph object requesting the total number of points.
  @return The suffix to append to the popup report. */
