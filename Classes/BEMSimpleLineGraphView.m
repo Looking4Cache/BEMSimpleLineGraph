@@ -1322,11 +1322,11 @@ typedef NS_ENUM(NSInteger, BEMInternalTags)
     closestDot.alpha = 0.8;
     
     
-    if (self.enablePopUpReport == YES && closestDot.tag >= DotFirstTag100 && closestDot.tag < DotLastTag1000 && [closestDot isKindOfClass:[BEMCircle class]] && self.alwaysDisplayPopUpLabels == NO) {
+    if (self.enablePopUpReport == YES && closestDot.tag >= DotFirstTag100 && [closestDot isKindOfClass:[BEMCircle class]] && self.alwaysDisplayPopUpLabels == NO) {
         [self setUpPopUpLabelAbovePoint:closestDot];
     }
     
-    if (closestDot.tag >= DotFirstTag100 && closestDot.tag < DotLastTag1000 && [closestDot isMemberOfClass:[BEMCircle class]]) {
+    if (closestDot.tag >= DotFirstTag100 && [closestDot isMemberOfClass:[BEMCircle class]]) {
         if ([self.delegate respondsToSelector:@selector(lineGraph:didTouchGraphWithClosestIndex:)] && self.enableTouchReport == YES) {
             [self.delegate lineGraph:self didTouchGraphWithClosestIndex:((NSInteger)closestDot.tag - DotFirstTag100)];
             
@@ -1444,7 +1444,7 @@ typedef NS_ENUM(NSInteger, BEMInternalTags)
 - (BEMCircle *)closestDotFromtouchInputLine:(UIView *)touchInputLine {
     currentlyCloser = CGFLOAT_MAX;
     for (BEMCircle *point in self.subviews) {
-        if (point.tag >= DotFirstTag100 && point.tag < DotLastTag1000 && [point isMemberOfClass:[BEMCircle class]]) {
+        if (point.tag >= DotFirstTag100 && [point isMemberOfClass:[BEMCircle class]]) {
             if (self.alwaysDisplayDots == NO && self.displayDotsOnly == NO) {
                 point.alpha = 0;
             }
